@@ -3,10 +3,29 @@
 var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
+var replace = require('gulp-replace');
 
 var $ = require('gulp-load-plugins')({
   pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
 });
+
+// profiling builds
+var argv = require('yargs').argv;
+var serversConfig = require('./servers-config.json');//require('./servers-config').serversConfig;
+var api = '';
+var cdn = '';
+
+//console.log(require( "../src/app/servers-config" ));
+
+console.log('serversConfig: ' + JSON.stringify(serversConfig));
+console.log('serversConfig.dev.cdn: ' + serversConfig.dev.cdn);
+console.log('argv: ' + JSON.stringify(argv));
+
+if (argv._ && argv._[0] && argv._[0] === "build" && argv.type) {
+  console.log("w build, type: " + argv.type);
+  setServers(argv.type);
+}
+
 
 gulp.task('partials', function () {
   return gulp.src([
@@ -56,6 +75,8 @@ gulp.task('html', ['inject', 'partials'], function () {
     .pipe(cssFilter.restore)
     .pipe(assets.restore())
     .pipe($.useref())
+    .pipe(replace(/<link rel="stylesheet" href="/g, '<link rel="stylesheet" href="' + cdn))
+    .pipe(replace(/<script src="/g, '<script src="' + cdn))
     .pipe($.revReplace())
     .pipe(htmlFilter)
     .pipe($.minifyHtml({
@@ -96,3 +117,20 @@ gulp.task('clean', function () {
 });
 
 gulp.task('build', ['html', 'fonts', 'other']);
+
+
+///////
+function setServers(buildType) {
+  if (!buildType) {
+    console.log("build type not provided");
+    return;
+  }
+
+  if (!serversConfig[buildType] || !serversConfig[buildType].api || !serversConfig[buildType].cdn) {
+    console.log("No proper configuration available for build type: " + buildType);
+    return;
+  }
+
+  api = serversConfig[buildType].api;
+  cdn = serversConfig[buildType].cdn;
+}

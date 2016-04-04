@@ -1,0 +1,14 @@
+{
+  "dev": {
+    "api": "http://dev.api.clixmix.bls.com/",
+    "cdn": "http://dev.cnd.clixmix.bls.com/"
+  },
+  "test": {
+    "api": "http://test.api.clixmix.bls.com/",
+    "cdn": "http://test.cnd.clixmix.bls.com/"
+  },
+  "prod": {
+    "api": "http://prod.api.clixmix.bls.com/",
+    "cdn": "http://prod.cnd.clixmix.bls.com/"
+  }
+}
